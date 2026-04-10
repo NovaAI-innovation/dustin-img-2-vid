@@ -6,9 +6,12 @@
     "packages/contracts"
   ],
   "scripts": {
+    "setup:api": "powershell -ExecutionPolicy Bypass -File ./apps/api/setup.ps1",
+    "setup:web": "powershell -ExecutionPolicy Bypass -File ./apps/web/setup.ps1",
+    "run:api": "powershell -ExecutionPolicy Bypass -File ./apps/api/run.ps1",
+    "run:web": "powershell -ExecutionPolicy Bypass -File ./apps/web/run.ps1",
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build",
     "test:web": "npm --workspace apps/web run test"
   }
 }
-

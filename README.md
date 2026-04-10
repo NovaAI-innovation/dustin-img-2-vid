@@ -9,30 +9,36 @@ A monorepo with clean frontend/backend separation:
 
 ## Quick Start
 
-### Root scripts (Windows / PowerShell)
+### Backend only (Windows / PowerShell)
+
+```powershell
+cd apps/api
+.\setup.ps1
+.\run.ps1
+```
+
+### Frontend only (Windows / PowerShell)
+
+```powershell
+cd apps/web
+.\setup.ps1
+.\run.ps1
+```
+
+### Full stack (orchestration wrappers)
 
 ```powershell
 .\setup.ps1
 .\run.ps1
 ```
 
-### Backend
+### npm helpers
 
 ```powershell
-cd apps/api
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-copy .env.example .env
-uvicorn app.main:app --reload --port 8000
-```
-
-### Frontend
-
-```powershell
-cd apps/web
-npm install
-npm run dev
+npm run setup:api
+npm run run:api
+npm run setup:web
+npm run run:web
 ```
 
 The frontend expects backend API at `http://localhost:8000` (via Vite proxy).

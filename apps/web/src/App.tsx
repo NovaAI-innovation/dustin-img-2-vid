@@ -423,13 +423,9 @@ export default function App() {
       <div className="scanlines" aria-hidden="true" />
 
       <header className="hero-card glass-panel">
-        <div>
-          <p className="kicker">PixVerse Studio / Video Operations Console</p>
-          <h1>Configure, run, and monitor video jobs from one unified workspace.</h1>
-          <p className="lede">
-            A complete operator view for text-to-video and image-to-video: validated generation settings, live job tracking,
-            and detailed metadata for every created clip.
-          </p>
+        <div className="hero-copy">
+          <p className="kicker">PixVerse Studio / Video Generation App</p>
+          <h1>pixverse-gen</h1>
         </div>
         <div className="hero-meta" aria-label="System health">
           <div className="metric-pill">
@@ -747,79 +743,90 @@ export default function App() {
                 <p className="hint">No generated clips found yet.</p>
               ) : (
                 <div className="history-grid">
-                  {jobsHistory.map((item) => (
-                    <article key={item.job_id} className="history-card glass-subpanel">
-                      <div className="history-meta history-meta-head">
-                        <div className="status-chip">
-                          <span className={`status-dot tone-${statusTone(item.status)}`} aria-hidden="true" />
-                          <strong>{item.status.toUpperCase()}</strong>
-                        </div>
-                        <span>{formatTimestamp(item.created_at)}</span>
-                      </div>
+                  {jobsHistory.map((item) => {
+                    const tone = statusTone(item.status);
+                    const hasVideo = Boolean(item.video_url || item.status === "succeeded");
+                    const profile = [
+                      item.quality,
+                      item.duration ? `${item.duration}s` : undefined,
+                      item.aspect_ratio
+                    ]
+                      .filter(Boolean)
+                      .join(" · ");
 
-                      <div className="video-meta-grid">
-                        <div className="video-meta-item">
-                          <span>Job ID</span>
-                          <strong className="mono-data">{item.job_id}</strong>
+                    return (
+                      <article key={item.job_id} className="history-card glass-subpanel">
+                        <div className="history-meta history-meta-head">
+                          <div className="status-chip">
+                            <span className={`status-dot tone-${tone}`} aria-hidden="true" />
+                            <strong>{item.status.toUpperCase()}</strong>
+                          </div>
+                          <span>{formatTimestamp(item.created_at)}</span>
                         </div>
-                        <div className="video-meta-item">
-                          <span>Mode</span>
-                          <strong>{item.mode ?? "n/a"}</strong>
-                        </div>
-                        <div className="video-meta-item">
-                          <span>Model</span>
-                          <strong>{item.model ?? "n/a"}</strong>
-                        </div>
-                        <div className="video-meta-item">
-                          <span>Updated</span>
-                          <strong>{formatTimestamp(item.updated_at)}</strong>
-                        </div>
-                        <div className="video-meta-item">
-                          <span>Render Time</span>
-                          <strong>{formatElapsed(item.created_at, item.updated_at)}</strong>
-                        </div>
-                        <div className="video-meta-item">
-                          <span>Profile</span>
-                          <strong>
-                            {[
-                              item.quality ?? "n/a",
-                              item.duration ? `${item.duration}s` : "n/a",
-                              item.aspect_ratio ?? "n/a"
-                            ].join(" / ")}
-                          </strong>
-                        </div>
-                      </div>
 
-                      {item.prompt && (
-                        <p className="history-prompt">
-                          <strong>Prompt:</strong> {item.prompt}
-                        </p>
-                      )}
+                        <div className="history-preview">
+                          {hasVideo ? (
+                            <video className="video history-video" src={getJobVideoLink(item.job_id)} controls />
+                          ) : (
+                            <div className={`history-state history-state-${tone}`}>
+                              <span className={`history-state-dot tone-${tone}`} aria-hidden="true" />
+                              <p className="history-state-title">{tone === "failed" ? "No clip was produced." : "Clip is not available yet."}</p>
+                              <p className="history-state-detail">
+                                {item.fail_reason ?? (tone === "running" ? "Rendering in progress. Refresh shortly." : "No video output was returned for this job.")}
+                              </p>
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="history-preview">
-                        {(item.video_url || item.status === "succeeded") ? (
-                          <video className="video history-video" src={getJobVideoLink(item.job_id)} controls />
-                        ) : (
-                          <p className="history-preview-empty">Video unavailable for this job.</p>
+                        <div className="video-meta-grid">
+                          <div className="video-meta-item">
+                            <span>Job ID</span>
+                            <strong className="mono-data">{item.job_id}</strong>
+                          </div>
+                          <div className="video-meta-item">
+                            <span>Model</span>
+                            <strong>{item.model ?? "n/a"}</strong>
+                          </div>
+                          <div className="video-meta-item">
+                            <span>Profile</span>
+                            <strong>{profile || "n/a"}</strong>
+                          </div>
+                          <div className="video-meta-item">
+                            <span>Render Time</span>
+                            <strong>{formatElapsed(item.created_at, item.updated_at)}</strong>
+                          </div>
+                        </div>
+
+                        {item.prompt && (
+                          <p className="history-prompt">
+                            <strong>Prompt:</strong> {item.prompt}
+                          </p>
                         )}
-                      </div>
 
-                      {(item.video_url || item.status === "succeeded") ? (
-                        <div className="link-row">
-                          <a className="link-btn" href={getJobVideoLink(item.job_id)} target="_blank" rel="noreferrer">
-                            Open Video
-                          </a>
-                          <a className="link-btn link-btn-secondary" href={getJobVideoLink(item.job_id)} target="_blank" rel="noreferrer" download>
-                            Download Video
-                          </a>
+                        <div className="history-actions">
+                          {hasVideo ? (
+                            <>
+                              <a className="link-btn" href={getJobVideoLink(item.job_id)} target="_blank" rel="noreferrer">
+                                Open Clip
+                              </a>
+                              <a className="link-btn link-btn-secondary" href={getJobVideoLink(item.job_id)} target="_blank" rel="noreferrer" download>
+                                Download
+                              </a>
+                            </>
+                          ) : (
+                            <>
+                              <button type="button" className="link-btn history-action-disabled" disabled>
+                                Open Clip
+                              </button>
+                              <button type="button" className="link-btn link-btn-secondary history-action-disabled" disabled>
+                                Download
+                              </button>
+                            </>
+                          )}
                         </div>
-                      ) : (
-                        <p className="hint">No video file available for this run.</p>
-                      )}
-
-                      {item.fail_reason && <p className="error">Reason: {item.fail_reason}</p>}
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </article>

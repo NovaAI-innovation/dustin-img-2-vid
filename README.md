@@ -54,3 +54,41 @@ See `apps/api/.env.example` for required and optional variables:
 - `ENABLE_PROMPT_ASSIST` (`true`/`false`)
 - `XAI_API_KEY` (required only when prompt assist is enabled)
 - `PIXVERSE_WEBHOOK_SECRET` (optional unless webhook endpoint is used)
+
+## VPS Deployment (Docker)
+
+Use the production-oriented compose file and root env file:
+
+1. Prepare env on the server:
+
+```bash
+cp .env.vps.example .env
+```
+
+2. Edit `.env` and set at least:
+
+- `PIXVERSE_API_KEY`
+- `XAI_API_KEY` (only if `ENABLE_PROMPT_ASSIST=true`)
+
+3. Build and start on VPS:
+
+```bash
+docker compose -f docker-compose.vps.yml up -d --build
+```
+
+4. Check health:
+
+```bash
+docker compose -f docker-compose.vps.yml ps
+docker compose -f docker-compose.vps.yml logs --tail 100 api
+docker compose -f docker-compose.vps.yml logs --tail 100 web
+```
+
+Notes:
+- Frontend is served by Nginx on `WEB_PORT` (default `80`).
+- Backend runs on the internal Docker network and is proxied via `/api` from the frontend container.
+- API job data persists in the named Docker volume `api_data`.
+
+If your provider auto-deploys `docker-compose.yml` from Git:
+- Set `PIXVERSE_API_KEY` in the provider's environment variables UI.
+- The stack now uses a named volume (`api_data`) by default to avoid host bind-mount permission issues with non-root containers.

@@ -355,6 +355,9 @@ h3 {
 
 .section-card {
   padding: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
 }
 
 .section-header {
@@ -362,7 +365,7 @@ h3 {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  margin-bottom: 0;
 }
 
 .split-header {
@@ -540,6 +543,46 @@ button:disabled {
   gap: var(--space-3);
 }
 
+.header-indicators {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--component-pill-radius);
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.status-indicator.is-active {
+  border-color: rgba(88, 215, 170, 0.5);
+  color: rgba(160, 247, 220, 0.96);
+  background: rgba(88, 215, 170, 0.14);
+}
+
+.status-indicator.is-inactive {
+  border-color: rgba(255, 107, 114, 0.5);
+  color: rgba(255, 177, 180, 0.96);
+  background: rgba(255, 107, 114, 0.14);
+}
+
+.status-dot-mini {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--component-pill-radius);
+  background: currentColor;
+}
+
 .inline-check {
   display: inline-flex;
   align-items: center;
@@ -556,7 +599,7 @@ button:disabled {
 }
 
 .source-box {
-  margin-top: var(--space-4);
+  margin-top: 0;
   padding: var(--space-4);
   border-radius: var(--component-radius-lg);
   border: 1px solid rgba(123, 177, 198, 0.32);
@@ -647,8 +690,8 @@ button:disabled {
 .history-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-5);
-  align-items: start;
+  gap: var(--space-4);
+  align-items: stretch;
 }
 
 .history-card {
@@ -658,6 +701,7 @@ button:disabled {
   padding: var(--space-4);
   display: grid;
   gap: var(--space-4);
+  height: 100%;
   box-shadow: var(--component-shadow-card);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
 }

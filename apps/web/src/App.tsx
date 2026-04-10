@@ -309,7 +309,7 @@ export default function App() {
   }
 
   async function onAssistPrompt() {
-    if (!canShowAssist || !settings.useAssist) return;
+    if (!canShowAssist) return;
     if (!prompt.trim()) {
       setError("Prompt is required.");
       return;
@@ -515,7 +515,13 @@ export default function App() {
               <article className="glass-panel section-card">
                 <div className="section-header">
                   <h2>Prompt Console</h2>
-                  <span className="mono-tag">{mode === "text" ? "TEXT_PIPELINE" : "IMAGE_PIPELINE"}</span>
+                  <div className="header-indicators">
+                    <span className="mono-tag">{mode === "text" ? "TEXT_PIPELINE" : "IMAGE_PIPELINE"}</span>
+                    <span className={canShowAssist ? "status-indicator is-active" : "status-indicator is-inactive"}>
+                      <span className="status-dot-mini" aria-hidden="true" />
+                      Prompt Enhancement {canShowAssist ? "Available" : "Unavailable"}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="field-grid two-col">
@@ -559,21 +565,13 @@ export default function App() {
 
                 {canShowAssist ? (
                   <div className="assist-row">
-                    <label className="inline-check" htmlFor="assist">
-                      <input
-                        id="assist"
-                        type="checkbox"
-                        checked={settings.useAssist}
-                        onChange={(e) => updateSettings({ useAssist: e.target.checked })}
-                      />
-                      Use prompt assist before submit
-                    </label>
-                    <button type="button" onClick={onAssistPrompt} disabled={assistLoading || !settings.useAssist}>
+                    <p className="hint">Prompt enhancement is available and can be applied before submitting.</p>
+                    <button type="button" onClick={onAssistPrompt} disabled={assistLoading || !prompt.trim()}>
                       {assistLoading ? "Assisting..." : "Assist Now"}
                     </button>
                   </div>
                 ) : (
-                  <p className="hint">Prompt assist is disabled by backend configuration.</p>
+                  <p className="hint">Prompt enhancement is disabled by backend configuration.</p>
                 )}
 
                 {mode === "image" && (

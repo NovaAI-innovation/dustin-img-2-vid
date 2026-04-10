@@ -15,7 +15,7 @@ describe("App", () => {
     fetchMock.mockReset();
   });
 
-  it("hides prompt assist toggle when backend feature is disabled", async () => {
+  it("shows prompt enhancement disabled state when backend feature is disabled", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -53,7 +53,7 @@ describe("App", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("Prompt assist is disabled by backend configuration.")).toBeInTheDocument();
+      expect(screen.getByText("Prompt enhancement is disabled by backend configuration.")).toBeInTheDocument();
     });
   });
 });

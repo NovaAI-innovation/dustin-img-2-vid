@@ -124,6 +124,7 @@ export default function App() {
   });
 
   const canShowAssist = Boolean(features?.prompt_assist_enabled);
+  const promptEnhancementEnabled = canShowAssist && settings.useAssist;
   const modelSupportsCameraMovement = model === "v4" || model === "v4.5";
   const effectivePollingIntervalMs = useMemo(
     () => Math.max(settings.pollingIntervalSeconds, 1) * 1000,
@@ -309,7 +310,7 @@ export default function App() {
   }
 
   async function onAssistPrompt() {
-    if (!canShowAssist) return;
+    if (!canShowAssist || !settings.useAssist) return;
     if (!prompt.trim()) {
       setError("Prompt is required.");
       return;
@@ -517,9 +518,9 @@ export default function App() {
                   <h2>Prompt Console</h2>
                   <div className="header-indicators">
                     <span className="mono-tag">{mode === "text" ? "TEXT_PIPELINE" : "IMAGE_PIPELINE"}</span>
-                    <span className={canShowAssist ? "status-indicator is-active" : "status-indicator is-inactive"}>
+                    <span className={promptEnhancementEnabled ? "status-indicator is-active" : "status-indicator is-inactive"}>
                       <span className="status-dot-mini" aria-hidden="true" />
-                      Prompt Enhancement {canShowAssist ? "Available" : "Unavailable"}
+                      Prompt Enhancement {canShowAssist ? (settings.useAssist ? "Enabled" : "Disabled") : "Unavailable"}
                     </span>
                   </div>
                 </div>
@@ -565,8 +566,12 @@ export default function App() {
 
                 {canShowAssist ? (
                   <div className="assist-row">
-                    <p className="hint">Prompt enhancement is available and can be applied before submitting.</p>
-                    <button type="button" onClick={onAssistPrompt} disabled={assistLoading || !prompt.trim()}>
+                    <p className="hint">
+                      {settings.useAssist
+                        ? "Prompt enhancement is enabled and can be applied before submitting."
+                        : "Prompt enhancement is disabled in Settings."}
+                    </p>
+                    <button type="button" onClick={onAssistPrompt} disabled={assistLoading || !settings.useAssist || !prompt.trim()}>
                       {assistLoading ? "Assisting..." : "Assist Now"}
                     </button>
                   </div>
@@ -838,7 +843,7 @@ export default function App() {
               </div>
               <p className="hint">These settings are saved in your browser and used to prefill the Generation form.</p>
 
-              <div className="field-grid">
+              <div className="field-grid settings-grid">
                 <div className="field">
                   <label htmlFor="settings-mode">Default Mode</label>
                   <select
@@ -1005,9 +1010,9 @@ export default function App() {
                       checked={settings.useAssist}
                       onChange={(e) => updateSettings({ useAssist: e.target.checked })}
                     />
-                    Enable prompt assist by default
+                    Enable prompt enhancement by default
                   </label>
-                  <p className="hint">When enabled, prompt assist is available before submission and can rewrite prompts automatically.</p>
+                  <p className="hint">Turn this on to enable prompt enhancement. Turn it off to disable prompt enhancement.</p>
                 </>
               )}
 

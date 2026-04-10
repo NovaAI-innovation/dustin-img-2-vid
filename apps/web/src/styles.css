@@ -424,6 +424,22 @@ h3 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.settings-grid .field {
+  grid-template-rows: auto var(--component-control-min-height) auto;
+}
+
+.settings-grid .field > label {
+  display: flex;
+  align-items: flex-end;
+  min-height: 1.4em;
+}
+
+.settings-grid .field > input,
+.settings-grid .field > select {
+  height: var(--component-control-min-height);
+  min-height: var(--component-control-min-height);
+}
+
 .field-span {
   grid-column: 1 / -1;
 }

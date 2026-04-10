@@ -870,12 +870,51 @@ button:disabled {
 
 .history-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
 .history-actions .link-btn {
   width: 100%;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(3, 7, 12, 0.78);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+
+.modal-card {
+  width: min(980px, 100%);
+  max-height: calc(100vh - 2 * var(--space-4));
+  overflow: auto;
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-2);
+}
+
+.modal-block h3 {
+  margin: 0;
+}
+
+.modal-block p {
+  margin: 0;
+  color: var(--semantic-text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .tone-running {
@@ -977,6 +1016,10 @@ button:disabled {
 
   .history-actions {
     grid-template-columns: 1fr;
+  }
+
+  .modal-card {
+    padding: var(--space-4);
   }
 }
 

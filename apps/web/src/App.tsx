@@ -79,12 +79,18 @@ function formatElapsed(createdAt?: string, updatedAt?: string): string {
   return `${seconds}s`;
 }
 
+function formatField(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "n/a";
+  return String(value);
+}
+
 export default function App() {
   const [features, setFeatures] = useState<Features | null>(null);
   const [options, setOptions] = useState<GenerationOptions | null>(null);
   const [job, setJob] = useState<JobDetail | null>(null);
   const [jobsHistory, setJobsHistory] = useState<JobListItem[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
+  const [selectedLibraryJob, setSelectedLibraryJob] = useState<JobListItem | null>(null);
   const [balance, setBalance] = useState<Balance | null>(null);
 
   const [activeTab, setActiveTab] = useState<TabKey>("generation");
@@ -222,6 +228,17 @@ export default function App() {
     refreshBalance();
     refreshHistory();
   }, []);
+
+  useEffect(() => {
+    if (!selectedLibraryJob) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedLibraryJob(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedLibraryJob]);
 
   const historySummary = useMemo(() => {
     const total = jobsHistory.length;
@@ -807,6 +824,13 @@ export default function App() {
                         )}
 
                         <div className="history-actions">
+                          <button
+                            type="button"
+                            className="link-btn link-btn-secondary"
+                            onClick={() => setSelectedLibraryJob(item)}
+                          >
+                            View Details
+                          </button>
                           {hasVideo ? (
                             <>
                               <a className="link-btn" href={getJobVideoLink(item.job_id)} target="_blank" rel="noreferrer">
@@ -1081,6 +1105,74 @@ export default function App() {
           </section>
         </aside>
       </div>
+
+      {selectedLibraryJob && (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={() => setSelectedLibraryJob(null)}
+        >
+          <section
+            className="glass-panel modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Job details for ${selectedLibraryJob.job_id}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="section-header split-header">
+              <div>
+                <h2>Job Details</h2>
+                <p className="hint">Complete metadata for job <span className="mono-data">{selectedLibraryJob.job_id}</span>.</p>
+              </div>
+              <button type="button" onClick={() => setSelectedLibraryJob(null)}>
+                Close
+              </button>
+            </div>
+
+            <div className="detail-grid">
+              <div className="video-meta-item"><span>Status</span><strong>{formatField(selectedLibraryJob.status).toUpperCase()}</strong></div>
+              <div className="video-meta-item"><span>Mode</span><strong>{formatField(selectedLibraryJob.mode)}</strong></div>
+              <div className="video-meta-item"><span>Model</span><strong>{formatField(selectedLibraryJob.model)}</strong></div>
+              <div className="video-meta-item"><span>Quality</span><strong>{formatField(selectedLibraryJob.quality)}</strong></div>
+              <div className="video-meta-item"><span>Duration</span><strong>{selectedLibraryJob.duration ? `${selectedLibraryJob.duration}s` : "n/a"}</strong></div>
+              <div className="video-meta-item"><span>Aspect Ratio</span><strong>{formatField(selectedLibraryJob.aspect_ratio)}</strong></div>
+              <div className="video-meta-item"><span>Motion Mode</span><strong>{formatField(selectedLibraryJob.motion_mode)}</strong></div>
+              <div className="video-meta-item"><span>Camera Movement</span><strong>{formatField(selectedLibraryJob.camera_movement)}</strong></div>
+              <div className="video-meta-item"><span>Seed</span><strong>{formatField(selectedLibraryJob.seed)}</strong></div>
+              <div className="video-meta-item"><span>Image ID</span><strong>{formatField(selectedLibraryJob.img_id)}</strong></div>
+              <div className="video-meta-item"><span>Webhook ID</span><strong>{formatField(selectedLibraryJob.webhook_id)}</strong></div>
+              <div className="video-meta-item"><span>Provider Video ID</span><strong>{formatField(selectedLibraryJob.provider_video_id)}</strong></div>
+              <div className="video-meta-item"><span>Provider Status</span><strong>{formatField(selectedLibraryJob.provider_status)}</strong></div>
+              <div className="video-meta-item"><span>Created</span><strong>{formatTimestamp(selectedLibraryJob.created_at)}</strong></div>
+              <div className="video-meta-item"><span>Updated</span><strong>{formatTimestamp(selectedLibraryJob.updated_at)}</strong></div>
+              <div className="video-meta-item"><span>Render Time</span><strong>{formatElapsed(selectedLibraryJob.created_at, selectedLibraryJob.updated_at)}</strong></div>
+            </div>
+
+            {selectedLibraryJob.prompt && (
+              <div className="source-box modal-block">
+                <h3>Prompt</h3>
+                <p>{selectedLibraryJob.prompt}</p>
+              </div>
+            )}
+
+            {selectedLibraryJob.negative_prompt && (
+              <div className="source-box modal-block">
+                <h3>Negative Prompt</h3>
+                <p>{selectedLibraryJob.negative_prompt}</p>
+              </div>
+            )}
+
+            <div className="link-row">
+              <a className="link-btn" href={getJobVideoLink(selectedLibraryJob.job_id)} target="_blank" rel="noreferrer">
+                Open Clip
+              </a>
+              <a className="link-btn link-btn-secondary" href={getJobVideoLink(selectedLibraryJob.job_id)} target="_blank" rel="noreferrer" download>
+                Download
+              </a>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
